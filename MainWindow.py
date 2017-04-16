@@ -22,19 +22,7 @@ class MainWindow:
 
         allModels = dbMk.loadAllMakes()
         self.model_value = StringVar()
-##        self.cbpMakes = ttk.Labelframe(self.demoPanel, text='List of Car Makes')
-##        self.cbMakes = ttk.Combobox(self.cbpMakes, textvariable=self.model_value)
-##        #add the handler to capture when the selected value is changed
-##        self.cbMakes.bind("<<ComboboxSelected>>", self.model_selected )
-##        self.cbMakes['values'] = dbMk.loadAllMakesInput()
-##        self.cbMakes.location(x=0, y=0)
-##        #makes = []
-##        #for m in allModels:
-##        #    makes.append(m[1])
-##
-##        self.cbMakes.pack(pady=5, padx=10)
-##        self.cbpMakes.pack(in_=self.demoPanel, side=TOP, pady=5, padx=10)
-##        self.cbpMakes.location(x=0, y=0)
+
 
         #Create tabs
         self.nb = ttk.Notebook(master)
@@ -56,6 +44,20 @@ class MainWindow:
 
         self.lstMakes.bind('<<ListboxSelect>>', self.lstMakeSelectionChanged)
         self.lstMakes.pack(side=LEFT, fill=BOTH)
+
+        self.lstModels = Listbox(self.tabVehicles, selectmode=SINGLE, relief=FLAT)
+        self.lstModels.insert(END, "Models")
+        self.lstModels.insert(END, "----------")
+        self.lstModels.insert(END, " ")
+        
+        self.lstModels.bind('<<ListboxSelect>>', self.lstModelSelectionChanged)
+        self.lstModels.pack(side=LEFT, fill=BOTH)
+
+        self.lstDetails = Listbox(self.tabVehicles, selectmode=SINGLE, relief=FLAT)
+        self.lstDetails.insert(END, "Details")
+        self.lstDetails.insert(END, "----------")
+        self.lstDetails.insert(END, " ")
+        self.lstDetails.pack(side=LEFT, fill=BOTH)
 
         Label(self.tabCustomers, text='First Name', relief=FLAT).grid(row = 1, column = 0)
 
@@ -100,7 +102,25 @@ class MainWindow:
         value = m.get(index)
         cars = dbCars.loadCarsByMake(value)
         for index, dat in enumerate(cars):
+            self.lstModels.delete(0, END)
+            self.lstModels.insert(END, "Models")
+            self.lstModels.insert(END, "----------")
+            self.lstModels.insert(END, " ")
+            self.lstModels.insert(END, '{}'.format(dat[2]))
             print("CarID: {} - Make: {} - Model: {} - Doors: {}".format(dat[0],dat[1],dat[2],dat[3]))
+
+    def lstModelSelectionChanged(self, event):
+        m = event.widget
+        index = int(m.curselection()[0])
+        value = m.get(index)
+        model = dbcars.loadCarsByModel(value)
+        for index, dat in enumerate(model):
+            self.lstDetails.detete(0, END)
+            self.lstDetails.insert(END, "Details")
+            self.lstDetails.insert(END, "----------")
+            self.lstDetails.insert(END, " ")
+            self.lstDetails.insert(END, "Doors: {}".format(dat[3]))
+            
 
 
 
