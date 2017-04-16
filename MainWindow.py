@@ -113,7 +113,7 @@ class MainWindow:
         m = event.widget
         index = int(m.curselection()[0])
         value = m.get(index)
-        model = dbcars.loadCarsByModel(value)
+        model = dbCars.loadCarsByModel(value)
         for index, dat in enumerate(model):
             self.lstDetails.detete(0, END)
             self.lstDetails.insert(END, "Details")
