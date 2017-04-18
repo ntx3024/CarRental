@@ -6,26 +6,50 @@ import CarsDBFunctions as db
 class TVClassExample(object):
     def __init__(self):
         self.root = Tk()
+        self.cMenu = Menu(self.root)
+        self.cMenu.add_command(label="Reserve", command=self.reserve)
+
         tree = ttk.Treeview(self.root)
-        tree["columns"] = ("CarID","Make" ,"Model" , "Doors")
-        tree.column("CarID", width=100)
-        tree.column("Make", width=175)
+        tree["columns"] = ("Model","Doors")
+        #tree.column("Make", width=175)
         tree.column("Model", width=175)
         tree.column("Doors", width=100)
-        #tree.heading("#0", text='ID', anchor='w')
+        tree.heading("#0", text='CarID', anchor='w')
         #tree.column("#0", anchor="w")
-        tree.heading("CarID", text="CarID")
-        tree.heading("Make", text="Make")
+        #tree.heading("Make", text="Make")
         tree.heading("Model", text="Model")
         tree.heading("Doors", text="Doors")
 
         mkDB = db.CarsDBFunctions()
         models = mkDB.loadAllCars()
 
-        for index, dat in enumerate(models):
-            tree.insert("",index, values=(dat[0], dat[1], dat[2], dat[3]))
+        #Get a distinct list of the models
+        MakeNames = sorted(set(list(zip(*models))[1]))
+
+        tvIndex = 0
+        #loop throough each make and get its list of models
+        for mk in MakeNames:
+            #create the parent node
+            nodeMake = tree.insert("", tvIndex, text=mk)
+            tvIndex += 1
+            #Get a list of all the Models for each make
+            MakeModels = [m for m in models if m[1] == mk]
+            for md in MakeModels:
+                #create a node for each model for the make
+                tree.insert(nodeMake, tvIndex, text=md[0], values=(md[2], md[3]))
+                tvIndex += 1
+                
+
+        #for index, dat in enumerate(models):
+        #    tree.insert("",index, text= dat[0], values=(dat[1], dat[2], dat[3]))
+
+        tree.bind("<Button-3>", self.popup)
 
 
-        tree.pack()
-    
+        tree.pack(side=TOP, fill=BOTH, expand=1)
+        
+    def popup(self, event):
+        self.cMenu.post(event.x_root, event.y_root)
 
+    def reserve(self, event):
+            print("Do Something...")
