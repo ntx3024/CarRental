@@ -4,14 +4,14 @@ import ipywidgets as ipyw
 from PIL import ImageTk, Image
 from MakesDBFunctions import *
 from CarsDBFunctions import *
-from CustDBFunctions import *
+from HistDBFunctions import *
 from TVClass import TVClassExample
 
 
 #Not sure best way to call these
 dbMk = MakesDBFunctions()
 dbCars = CarsDBFunctions()
-dbCust = CustDBFunctions()
+dbHist = HistDBFunctions()
 
 class MainWindow:
     def __init__(self, master): 
@@ -39,7 +39,8 @@ class MainWindow:
         self.nb.add(self.tabReservations, text="Reservations")
         self.nb.add(self.tabTree, text="VehiclesTree")
         self.nb.pack(side=BOTTOM, fill=BOTH, expand=1)
-        
+
+        #make listbox for makes of vehicles and populate with all makes
         self.lstMakes = Listbox(self.tabVehicles, selectmode=SINGLE, relief=FLAT)
         allMakes = dbMk.loadAllMakes()
         self.lstMakes.insert(END, "Makes")
@@ -47,10 +48,10 @@ class MainWindow:
         self.lstMakes.insert(END, " ")
         for m in allMakes:
             self.lstMakes.insert(END, m[1])
-
+        #add information to listbox and raise event handles
         self.lstMakes.bind('<<ListboxSelect>>', self.lstMakeSelectionChanged)
         self.lstMakes.pack(side=LEFT, fill=BOTH, expand=1)
-
+        
         self.lstModels = Listbox(self.tabVehicles, selectmode=SINGLE, relief=FLAT)
         self.lstModels.insert(END, "Models")
         self.lstModels.insert(END, "----------")
@@ -65,7 +66,7 @@ class MainWindow:
         self.lstDetails.insert(END, " ")
         self.lstDetails.pack(side=LEFT, fill=BOTH, expand=1)
 
-        
+        #Add tree to Vehicle Tree Tab
         models = dbCars.loadAllCars()
         self.treeCars = ttk.Treeview(self.tabTree)
         self.treeCars['show']='headings'
@@ -74,8 +75,6 @@ class MainWindow:
         self.treeCars.column("Make", width=175, anchor=S)
         self.treeCars.column("Model", width=175, anchor=S)
         self.treeCars.column("Doors", width=100, anchor=S)
-        #tree.heading("#0", text='ID', anchor='w')
-        #tree.column("#0", anchor="w")
         self.treeCars.heading("CarID", text="CarID", anchor=W)
         self.treeCars.heading("Make", text="Make")
         self.treeCars.heading("Model", text="Model")
@@ -84,6 +83,29 @@ class MainWindow:
             self.treeCars.insert("",index, values=(dat[0], dat[1], dat[2], dat[3]))
         self.treeCars.pack(side=TOP, fill=BOTH, expand=1)
 
+        #Add tree to bottom of customer tab
+        custHist = dbHist.loadCustHist()
+        self.treeCust = ttk.Treeview(self.tabCustomers)
+        self.treeCust['show']='headings'
+        self.treeCust["columns"] = ("FirstName","LastName","ReservationID","Model","RealStartDate","RealEndDate")
+        self.treeCust.column("FirstName", width=100, anchor=S)
+        self.treeCust.column("LastName", width=100, anchor=S)
+        self.treeCust.column("ReservationID", width=50, anchor=S)
+        self.treeCust.column("Model", width=150, anchor=S)
+        self.treeCust.column("RealStartDate", width=100, anchor=S)
+        self.treeCust.column("RealEndDate", width=100, anchor=S)
+        #add headings
+        self.treeCust.heading("FirstName", text="First Name", anchor=W)
+        self.treeCust.heading("LastName", text="Last Name")
+        self.treeCust.heading("ReservationID", text="Reservation ID")
+        self.treeCust.heading("Model", text="Model")
+        self.treeCust.heading("RealStartDate", text="Start Date")
+        self.treeCust.heading("RealEndDate", text="End Date", anchor=E)
+        for index, dat in enumerate(custHist):
+            self.treeCust.insert("",index, values=(dat[0], dat[1], dat[2], dat[3], dat[4]))
+        self.treeCust.pack(side=BOTTOM, fill=BOTH, expand=1)
+
+        #add labels and buttons to customer tab    
         Label(self.tabCustomers, text='First Name', relief=FLAT).pack(side=LEFT, anchor=N+W)
         self.fNameEntry = Entry(master=self.tabCustomers).pack(side=LEFT, anchor=N+W)
 
@@ -99,48 +121,46 @@ class MainWindow:
         self.histBtn = Button(self.tabCustomers, text='Show History')
         self.histBtn.pack(side=LEFT, anchor=N+W)
 
-        custHist = dbCust.loadCustHist()
-        self.treeCust = ttk.Treeview(self.tabCustomers)
-        self.treeCust['show']='headings'
-        self.treeCust["columns"] = ("FirstName","LastName","ReservationID","Model", "StartDate","EndDate","RealStartDate","RealEndDate")
-        self.treeCust.column("FirstName", width=100, anchor=S)
-        self.treeCust.column("LastName", width=175, anchor=S)
-        self.treeCust.column("ReservationID", width=175, anchor=S)
-        self.treeCust.column("Model", width=100, anchor=S)
-        self.treeCust.column("StartDate", width=100, anchor=S)
-        self.treeCust.column("EndDate", width=175, anchor=S)
-        self.treeCust.column("RealStartDate", width=175, anchor=S)
-        self.treeCust.column("RealEndDate", width=100, anchor=S)
-        #tree.heading("#0", text='ID', anchor='w')
-        #tree.column("#0", anchor="w")
-        self.treeCust.heading("FirstName", text="First Name", anchor=W)
-        self.treeCust.heading("LastName", text="Last Name")
-        self.treeCust.heading("ReservationID", text="Reservation ID")
-        self.treeCust.heading("Model", text="Model")
-        self.treeCust.heading("StartDate", text="Start Date")
-        self.treeCust.heading("EndDate", text="End Date")
-        self.treeCust.heading("RealStartDate", text="Real Start Date")
-        self.treeCust.heading("RealEndDate", text="Real End Date", anchor=E)
-        for index, dat in enumerate(custHist):
-            self.treeCust.insert("",index, values=(dat[0], dat[1], dat[2], dat[3], dat[4], dat[5], dat[6]))
-        self.treeCust.pack(side=BOTTOM, fill=BOTH, expand=1)
+        #add tree to reservation tab
+        reservation = dbHist.loadRes()
+        self.treeRes = ttk.Treeview(self.tabReservations)
+        self.treeRes['show']='headings'
+        self.treeRes["columns"] = ("ReservationID","Model","FirstName","LastName","StartDate","EndDate")
+        self.treeRes.column("ReservationID", width=100, anchor=S)
+        self.treeRes.column("Model", width=100, anchor=S)
+        self.treeRes.column("FirstName", width=50, anchor=S)
+        self.treeRes.column("LastName", width=150, anchor=S)
+        self.treeRes.column("StartDate", width=100, anchor=S)
+        self.treeRes.column("EndDate", width=100, anchor=S)
+        #add headings
+        self.treeRes.heading("ReservationID", text="Reservation ID", anchor=W)
+        self.treeRes.heading("Model", text="Model")
+        self.treeRes.heading("FirstName", text="First Name")
+        self.treeRes.heading("LastName", text="Last Name")
+        self.treeRes.heading("StartDate", text="Start Date")
+        self.treeRes.heading("EndDate", text="End Date", anchor=E)
+        for index, dat in enumerate(reservation):
+            self.treeRes.insert("",index, values=(dat[0], dat[1], dat[2], dat[3], dat[4]))
+        self.treeRes.pack(side=RIGHT, fill=BOTH, expand=1)
+
+        #add labels and button to reservation tab
+        Label(self.tabReservations, text='First Name', relief=FLAT).pack(side=TOP, anchor=N+W)
+        self.fNameEntry = Entry(master=self.tabReservations).pack(side=TOP, anchor=N+W)
+
+        Label(self.tabReservations, text='Last Name', relief=FLAT).pack(side=TOP, anchor=N+W)
+        self.lNameEntry = Entry(master=self.tabReservations).pack(side=TOP, anchor=N+W)
+
+        Label(self.tabReservations, text='Pickup Day', relief=FLAT).pack(side=TOP, anchor=N+W)
+        self.puEntry = Entry(master=self.tabReservations).pack(side=TOP, anchor=N+W)
+        self.puEntry#(8, 'MM-DD-YYYY')
+
+        Label(self.tabReservations, text='Drop Off Day', relief=FLAT).pack(side=TOP, anchor=N+W)
+        self.doEntry = Entry(master=self.tabReservations).pack(side=TOP, anchor=N+W)
+
+        self.findResBtn = Button(self.tabReservations, text='Find Reservation')
+        self.findResBtn.pack(side=TOP, anchor=N+W)
 
         
-        
-        
-        
-##        Label(self.tabReservations, text='First Name', relief=FLAT).grid(row = 1, column = 0)
-##        self.fNameEntry = Entry(master=self.tabReservations).grid(row=1, column = 1)
-##
-##        Label(self.tabReservations, text='Last Name', relief=FLAT).grid(row = 1, column = 2)
-##        self.lNameEntry = Entry(master=self.tabReservations).grid(row=1, column = 3)
-##
-##        Label(self.tabReservations, text='Pickup Day', relief=FLAT).grid(row=2, column=0)
-##        self.puEntry = Entry(master=self.tabReservations).grid(row=2, column=1)
-##        self.puEntry#(8, 'MM-DD-YYYY')
-##
-##        Label(self.tabReservations, text='Drop Off Day', relief=FLAT).grid(row=2, column=2)
-##        self.doEntry = Entry(master=self.tabReservations).grid(row=2, column=3)
 
     def greet(self):
         print("Greetings!")
