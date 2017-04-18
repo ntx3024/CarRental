@@ -3,6 +3,7 @@ from tkinter import ttk
 from PIL import ImageTk, Image
 from MakesDBFunctions import *
 from CarsDBFunctions import *
+from TVClass import TVClassExample
 
 
 #Not sure best way to call these
@@ -29,9 +30,11 @@ class MainWindow:
         self.tabVehicles = ttk.Frame(self.nb)
         self.tabCustomers = ttk.Frame(self.nb)
         self.tabReservations = ttk.Frame(self.nb)
+        self.tabTree = ttk.Frame(self.nb)
         self.nb.add(self.tabVehicles, text="Vehicles")
         self.nb.add(self.tabCustomers, text="Customers")
         self.nb.add(self.tabReservations, text="Reservations")
+        self.nb.add(self.tabTree, text="VehiclesTree")
         self.nb.pack(side=BOTTOM, fill=BOTH, expand=Y)
         
         self.lstMakes = Listbox(self.tabVehicles, selectmode=SINGLE, relief=FLAT)
@@ -51,15 +54,34 @@ class MainWindow:
         self.lstModels.insert(END, " ")
         
         self.lstModels.bind('<<ListboxSelect>>', self.lstModelSelectionChanged)
-        self.lstModels.pack(side=LEFT, fill=BOTH)
+        self.lstModels.pack(side=LEFT, fill=Y)
 
         self.lstDetails = Listbox(self.tabVehicles, selectmode=SINGLE, relief=FLAT)
         self.lstDetails.insert(END, "Details")
         self.lstDetails.insert(END, "----------")
         self.lstDetails.insert(END, " ")
-        self.lstDetails.pack(side=LEFT, fill=BOTH)
+        self.lstDetails.pack(side=LEFT, fill=Y)
 
         Label(self.tabCustomers, text='First Name', relief=FLAT).grid(row = 1, column = 0)
+
+        models = dbCars.loadAllCars()
+        self.treeCars = ttk.Treeview(self.tabTree)
+        self.treeCars['show']='headings'
+        self.treeCars["columns"] = ("CarID","Make" ,"Model" , "Doors")
+        self.treeCars.column("CarID", width=100, anchor=S)
+        self.treeCars.column("Make", width=175, anchor=S)
+        self.treeCars.column("Model", width=175, anchor=S)
+        self.treeCars.column("Doors", width=100, anchor=S)
+        #tree.heading("#0", text='ID', anchor='w')
+        #tree.column("#0", anchor="w")
+        self.treeCars.heading("CarID", text="CarID", anchor=W)
+        self.treeCars.heading("Make", text="Make")
+        self.treeCars.heading("Model", text="Model")
+        self.treeCars.heading("Doors", text="Doors", anchor=E)
+        for index, dat in enumerate(models):
+            self.treeCars.insert("",index, values=(dat[0], dat[1], dat[2], dat[3]))
+        self.treeCars.pack(side=BOTTOM, fill=BOTH)
+
 
     def greet(self):
         print("Greetings!")
@@ -68,6 +90,9 @@ class MainWindow:
         print("They selected a model {0}".format(self.model_value.get()))
     
     #Build the menu for the main window
+    
+
+        
     def initMenu(self):
        root.iconbitmap(default='logo.ico')
        menu = Menu(self.master)
@@ -90,7 +115,8 @@ class MainWindow:
 
 
     def NewFile(self):
-        print("New File!")
+        print("THis is a test...")
+        TkC = TVClassExample()
     def OpenFile(self):
         print(name)
     def About(self):
@@ -98,29 +124,37 @@ class MainWindow:
     
     def lstMakeSelectionChanged(self, event):
         m = event.widget
-        index = int(m.curselection()[0])
-        value = m.get(index)
-        cars = dbCars.loadCarsByMake(value)
-        for index, dat in enumerate(cars):
+        if m.curselection() != '':
+            index = int(m.curselection()[0])
+            value = m.get(index)
+            cars = dbCars.loadCarsByMake(value)
             self.lstModels.delete(0, END)
             self.lstModels.insert(END, "Models")
             self.lstModels.insert(END, "----------")
             self.lstModels.insert(END, " ")
-            self.lstModels.insert(END, '{}'.format(dat[2]))
-            print("CarID: {} - Make: {} - Model: {} - Doors: {}".format(dat[0],dat[1],dat[2],dat[3]))
-
-    def lstModelSelectionChanged(self, event):
-        m = event.widget
-        index = int(m.curselection()[0])
-        value = m.get(index)
-        model = dbCars.loadCarsByModel(value)
-        for index, dat in enumerate(model):
-            self.lstDetails.detete(0, END)
+            self.lstDetails.delete(0, END)
             self.lstDetails.insert(END, "Details")
             self.lstDetails.insert(END, "----------")
             self.lstDetails.insert(END, " ")
-            self.lstDetails.insert(END, "Doors: {}".format(dat[3]))
-            
+            for index, dat in enumerate(cars):
+                self.lstModels.insert(END, '{}'.format(dat[1]))
+
+
+
+    def lstModelSelectionChanged(self, event):
+        m = event.widget
+        if m.curselection() != '':
+            index = int(m.curselection()[0])
+            value = m.get(index)
+            cars = dbCars.loadCarsByModel(value)
+            self.lstDetails.delete(0, END)
+            self.lstDetails.insert(END, "Details")
+            self.lstDetails.insert(END, "----------")
+            self.lstDetails.insert(END, " ")
+            self.lstDetails.insert(END, "Colors:\n")
+            for index, dat in enumerate(cars):
+                self.lstDetails.insert(END, "              {}".format(dat[2]))
+            self.lstDetails.insert(END, "Door: {}".format(dat[1]))
 
 
 
