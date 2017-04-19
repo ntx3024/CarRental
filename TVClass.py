@@ -10,15 +10,19 @@ class TVClassExample(object):
         self.cMenu.add_command(label="Reserve", command=self.reserve)
 
         tree = ttk.Treeview(self.root)
-        tree["columns"] = ("Model","Doors")
+        tree["columns"] = ("Model","Doors", "Color", "IsRented")
         #tree.column("Make", width=175)
         tree.column("Model", width=175)
         tree.column("Doors", width=100)
+        tree.column("Color", width=100)
+        tree.column("IsRented", width=100)
         tree.heading("#0", text='CarID', anchor='w')
         #tree.column("#0", anchor="w")
         #tree.heading("Make", text="Make")
         tree.heading("Model", text="Model")
         tree.heading("Doors", text="Doors")
+        tree.heading("Color", text="Color")
+        tree.heading("IsRented", text="Rented")
 
         mkDB = db.CarsDBFunctions()
         models = mkDB.loadAllCars()
@@ -36,7 +40,7 @@ class TVClassExample(object):
             MakeModels = [m for m in models if m[1] == mk]
             for md in MakeModels:
                 #create a node for each model for the make
-                tree.insert(nodeMake, tvIndex, text=md[0], values=(md[2], md[3]))
+                tree.insert(nodeMake, tvIndex, text=md[0], values=(md[2], md[3], md[4], md[5]))
                 tvIndex += 1
                 
 
@@ -51,5 +55,5 @@ class TVClassExample(object):
     def popup(self, event):
         self.cMenu.post(event.x_root, event.y_root)
 
-    def reserve(self, event):
+    def reserve(self):
             print("Do Something...")

@@ -7,7 +7,7 @@ class CarsDBFunctions(db.BaseDBFunctions):
         super().__init__()
 
     def loadAllCars(self):
-        records = super().loadRecords('SELECT C.CarID, M.Make, C.Model, C.Doors FROM MAKES AS M INNER JOIN CARS AS C ON M.MakeID = C.MakeID ORDER BY M.Make, C.Model')
+        records = super().loadRecords("SELECT C.CarID , M.Make , C.Model , C.Doors , C.Color , ( SELECT COUNT(1) FROM Reservations AS R WHERE R.CarID = C.CarID AND DATETIME(R.EndDate) > DATETIME('now') ) AS IsRented FROM MAKES AS M INNER JOIN CARS AS C ON M.MakeID = C.MakeID ORDER BY M.Make , C.Model")
         return records
 
     def loadCarsByMake(self, make):
