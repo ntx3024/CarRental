@@ -22,10 +22,21 @@ class CustDBFunctions(db.BaseDBFunctions):
         records = super().loadRecords("SELECT * FROM Customers WHERE LastName LIKE '{}%'".format(LastName))
         return records
 
+    def loadCustomerByID(self, custID):
+        records = super().loadRecords("SELECT * FROM Customers WHERE CustomerID = '{}'".format(custID))
+        return records
+
     def loadCustomersByName(self, FistName, LastName):
         records = super().loadRecords("SELECT * FROM Customers WHERE FirstName LIKE '{}%' AND LastName LIKE '{}%'".format(FistName, LastName))
         return records
 
     def AddNewCustomer(self, FirstName, LastName, Phone):
         super().AddNewRecord("INSERT INTO Customers(FirstName, LastName, PhoneNumber) VALUES('{}', '{}', '{}')".format(FirstName, LastName, Phone))
+
+    def DeleteCustomer(self, CustomerID):
+        super().loadRecords("DELETE FROM Customers WHERE CustomerID = '{}'".format(CustomerID))
+
+    def UpdateCustomer(self, FirstName, LastName, PhoneNumber, CustomerID):
+        super().AddNewRecord("UPDATE Customers Set FirstName = '{}', LastName = '{}', PhoneNumber = '{}' WHERE CustomerID = '{}'".format(FirstName, LastName, PhoneNumber, CustomerID))
+
         

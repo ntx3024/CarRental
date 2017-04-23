@@ -7,12 +7,11 @@ dbCars = CarsDBFunctions()
 class CarsFunctions(object):
     pass
 
-    def selection(self):
-        print(self.popup.selection)
-            
+    
     def popup(self, event):
         try:
-            self.treeCars.set(self.treeCars.identify_row(event.y))
+            #TODO figure out how to mark row as selected with either click
+            self.treeCars.selection_set(self.treeCars.identify_row(event.y))
             self.cMenu.post(event.x_root, event.y_root)
         finally:
             print("Did it Show")
@@ -26,8 +25,8 @@ class CarsFunctions(object):
         tvSelected = self.treeCars.selection()[0]
         #Get the ID For the Selected Car
         self.carID = self.treeCars.item(tvSelected, "text")
-        dlg = CarReserveDialog(self)
         #TODO:  Force this call after the window closes
+        self.root.wait_window(CarReserveDialog(self))
         self.ReloadCars()
         #self.ReserveCar(carID)
        
@@ -79,6 +78,7 @@ class CarsFunctions(object):
         self.cMenu.add_command(label="Reserve", command=self.reserve)
         carList = dbCars.loadAllCars()
         self.BuildTreeView(carList)
+        
 
 
        

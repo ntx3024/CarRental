@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ProfilingTarget xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ProjectTarget>
+    <TargetProject>a14495ac-3e3e-466a-9485-b84c875f6b4b</TargetProject>
+    <FriendlyName>Killian</FriendlyName>
+  </ProjectTarget>
+  <Reports>
+    <Report>
+      <Filename>C:\Users\Mike\AppData\Local\Temp\Killian_20170413.vsp</Filename>
+    </Report>
+  </Reports>
+</ProfilingTarget>

@@ -25,8 +25,7 @@ class MakesDBFunctions(db.BaseDBFunctions):
 
 makesDB = MakesDBFunctions()
 allMakes = makesDB.loadAllMakes()
-for m in allMakes:
-    print(m)
+
 
        
     
